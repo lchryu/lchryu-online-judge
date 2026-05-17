@@ -1,6 +1,6 @@
 # 🐉 LchRyu Online Judge
 
-Chào mừng đến với **LchRyu Online Judge** — Hệ thống chấm bài hiện đại, mạnh mẽ và đầy cá tính. Tên gọi được kết hợp từ initials của nhà sáng lập (Lch - Lương Chung Hồi) và biểu tượng Rồng (Ryu) đầy sức mạnh.
+Chào mừng đến với **LchRyu Online Judge** — Hệ thống chấm bài hiện đại, mạnh mẽ và đầy cá tính. Tên gọi được kết hợp từ initials của nhà sáng lập (Lch - Lương Chung Hội) và biểu tượng Rồng (Ryu) đầy sức mạnh.
 
 ## 🏛️ Kiến trúc tổng thể (System Architecture)
 
