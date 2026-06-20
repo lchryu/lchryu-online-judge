@@ -55,7 +55,14 @@ export class AuthController {
 
       res.json({
         token,
-        user: { id: user.id, username: user.username, role: user.role, avatarUrl: user.avatarUrl }
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          avatarUrl: user.avatarUrl,
+          createdAt: user.createdAt,
+        }
       });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
@@ -92,7 +99,14 @@ export class AuthController {
       await userRepository.save(user);
       res.json({ 
         message: "Profile updated successfully",
-        user: { id: user.id, username: user.username, role: user.role, avatarUrl: user.avatarUrl }
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          avatarUrl: user.avatarUrl,
+          createdAt: user.createdAt,
+        }
       });
     } catch (error) {
       res.status(500).json({ message: "Error updating profile" });
@@ -116,7 +130,14 @@ export class AuthController {
       res.json({ 
         message: "Avatar uploaded successfully", 
         avatarUrl,
-        user: { id: user.id, username: user.username, role: user.role, avatarUrl: user.avatarUrl }
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          avatarUrl: user.avatarUrl,
+          createdAt: user.createdAt,
+        }
       });
     } catch (error) {
       res.status(500).json({ message: "Error uploading avatar" });

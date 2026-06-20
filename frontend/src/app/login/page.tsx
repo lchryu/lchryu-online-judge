@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { LogIn, User, Lock } from "lucide-react";
+import { api, getErrorMessage } from "@/lib/api";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -20,14 +20,14 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await api.post("/auth/login", {
         username,
         password,
       });
       login(res.data.token, res.data.user);
       router.push("/");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed");
+    } catch (err) {
+      setError(getErrorMessage(err, "Login failed"));
     } finally {
       setLoading(false);
     }
@@ -92,7 +92,7 @@ export default function LoginPage() {
 
         <div className="mt-8 text-center pt-6 border-t border-slate-100">
           <p className="text-sm text-slate-500">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="text-blue-600 font-bold hover:underline">
               Register now
             </Link>

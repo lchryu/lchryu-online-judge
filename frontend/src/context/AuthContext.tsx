@@ -1,11 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
-interface User {
+export interface User {
   id: number;
   username: string;
+  email?: string;
   role: string;
+  avatarUrl?: string | null;
+  createdAt?: string;
 }
 
 interface AuthContextType {
@@ -17,17 +20,30 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const readSavedUser = () => {
+  if (typeof window === "undefined") return null;
+  const savedUser = localStorage.getItem("user");
+  if (!savedUser) return null;
+
+  try {
+    return JSON.parse(savedUser) as User;
+  } catch {
+    localStorage.removeItem("user");
+    return null;
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-    }
+    const loadSavedAuth = window.setTimeout(() => {
+      setUser(readSavedUser());
+      setToken(localStorage.getItem("token"));
+    }, 0);
+
+    return () => window.clearTimeout(loadSavedAuth);
   }, []);
 
   const login = (newToken: string, newUser: User) => {

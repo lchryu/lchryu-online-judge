@@ -30,6 +30,9 @@ export class Submission {
   @Column({ type: "text", nullable: true })
   compileOutput!: string;
 
+  @Column({ type: "text", nullable: true })
+  testResults!: string;
+
   @ManyToOne(() => Problem)
   problem!: Problem;
 

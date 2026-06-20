@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { AppDataSource } from "./data-source";
 import problemRoutes from "./routes/problemRoutes";
 import authRoutes from "./routes/authRoutes";
+import { startJudgeWorker } from "./workers/judgeWorker";
 
 import path from "path";
 
@@ -20,6 +21,9 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 AppDataSource.initialize()
   .then(() => {
     console.log("Database connection established");
+    
+    // Start BullMQ judge worker
+    startJudgeWorker();
     
     app.use("/api/problems", problemRoutes);
     app.use("/api/auth", authRoutes);

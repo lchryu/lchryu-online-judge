@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import { useState, useEffect, useRef, useMemo } from "react";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import { User, Mail, Lock, Save, ShieldCheck, Camera, CheckCircle, Upload } from "lucide-react";
+import { User, Mail, Lock, Save, ShieldCheck, Camera, CheckCircle } from "lucide-react";
+import { api, getErrorMessage } from "@/lib/api";
 
 export default function ProfilePage() {
   const { token, user: authUser, login } = useAuth();
@@ -16,18 +17,22 @@ export default function ProfilePage() {
   const [notification, setNotification] = useState<{ text: string, type: 'success' | 'error' | null }>({ text: "", type: null });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const avatars = [
+  const avatars = useMemo(() => [
     "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
     "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka",
     "https://api.dicebear.com/7.x/avataaars/svg?seed=Buddy",
     "https://api.dicebear.com/7.x/avataaars/svg?seed=Max",
     "https://api.dicebear.com/7.x/avataaars/svg?seed=Lilly",
     "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack",
-  ];
+  ], []);
+
+  const createdDate = authUser?.createdAt
+    ? new Date(authUser.createdAt).toLocaleDateString()
+    : "Unknown";
 
   useEffect(() => {
     if (token) {
-      axios.get("http://localhost:5000/api/auth/me", {
+      api.get("/auth/me", {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => {
@@ -41,7 +46,7 @@ export default function ProfilePage() {
         setLoading(false);
       });
     }
-  }, [token]);
+  }, [avatars, token]);
 
   const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -52,7 +57,7 @@ export default function ProfilePage() {
 
     try {
       setUpdating(true);
-      const res = await axios.post("http://localhost:5000/api/auth/avatar", formData, {
+      const res = await api.post("/auth/avatar", formData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data"
@@ -62,7 +67,7 @@ export default function ProfilePage() {
       login(token, res.data.user);
       showNotification("Avatar uploaded successfully!", "success");
     } catch (err) {
-      showNotification("Failed to upload avatar", "error");
+      showNotification(getErrorMessage(err, "Failed to upload avatar"), "error");
     } finally {
       setUpdating(false);
     }
@@ -78,7 +83,7 @@ export default function ProfilePage() {
     setUpdating(true);
     setNotification({ text: "", type: null });
     try {
-      const res = await axios.put("http://localhost:5000/api/auth/profile", {
+      const res = await api.put("/auth/profile", {
         username,
         email,
         avatarUrl,
@@ -90,8 +95,8 @@ export default function ProfilePage() {
       login(token!, res.data.user);
       showNotification("Profile updated successfully!", "success");
       setPassword("");
-    } catch (err: any) {
-      showNotification(err.response?.data?.message || "Update failed", "error");
+    } catch (err) {
+      showNotification(getErrorMessage(err, "Update failed"), "error");
     } finally {
       setUpdating(false);
     }
@@ -118,7 +123,7 @@ export default function ProfilePage() {
         <div className="w-full md:w-1/3 bg-slate-50 border-r border-slate-100 p-8 flex flex-col items-center">
            <div className="relative group mb-6">
               <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-white relative">
-                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                <Image src={avatarUrl} alt="Avatar" width={128} height={128} unoptimized className="h-full w-full object-cover" />
                 {updating && (
                   <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
                     <div className="h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
@@ -148,7 +153,7 @@ export default function ProfilePage() {
                   onClick={() => setAvatarUrl(url)}
                   className={`w-10 h-10 rounded-full border-2 transition transform hover:scale-110 ${avatarUrl === url ? 'border-blue-600 shadow-md ring-2 ring-blue-100' : 'border-transparent hover:border-slate-300'}`}
                 >
-                  <img src={url} alt={`Avatar ${i}`} className="w-full h-full p-1" />
+                  <Image src={url} alt={`Avatar ${i}`} width={40} height={40} unoptimized className="h-full w-full p-1" />
                 </button>
               ))}
            </div>
@@ -158,7 +163,7 @@ export default function ProfilePage() {
                 <ShieldCheck size={14} />
                 <span className="text-[10px] font-black uppercase tracking-wider">{authUser?.role} Account</span>
               </div>
-              <p className="text-[10px] text-slate-400 italic">Created: {new Date(authUser?.createdAt || Date.now()).toLocaleDateString()}</p>
+              <p className="text-[10px] text-slate-400 italic">Created: {createdDate}</p>
            </div>
         </div>
 
